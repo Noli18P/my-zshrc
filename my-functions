@@ -1,0 +1,28 @@
+function mkt(){
+        mkdir {nmap,scripts,info,tmp,exploits};
+}
+
+function initial() {
+        ip=$1
+        rate=$2
+        echo "[!] Ejecutando escaneo rápido a la dirección $ip";
+        sudo nmap -sS --min-rate $rate -p- --open -Pn -n -oG allPorts $ip;
+
+        ports="$(cat allPorts | grep -oP '\d{1,5}/open' | awk '{print $1}' FS='/' | xargs | tr ' ' ',')"
+
+        echo "\n[!] Los puertos abiertos encontrados son: $ports";
+
+        sudo nmap -sCV -p $ports -Pn -n -oN targeted $ip;
+
+        echo "\n[!] Escaneo inicial finalizado!";
+}
+
+function leer() {
+        file_path=$1;
+        batcat $file_path -l python;
+}
+
+function web(){
+        ip=$1
+        whatweb http://$ip --aggression 3 -v > webScan
+}
